@@ -1,6 +1,8 @@
 # web_link
 
-Web linking header parser library for Pony.
+Parser for [RFC 8288](https://www.rfc-editor.org/rfc/rfc8288) (Web Linking) HTTP Link headers in Pony. Implements the link-value grammar from Section 3 including quoted-string parameters, OWS/BWS handling, and multi-link comma-separated headers.
+
+Multiple `hreflang` values on a single link (RFC 8288 allows repeated `hreflang` parameters) are not supported; only the first occurrence is kept. RFC 8187 extended parameter decoding (e.g. `title*`) is not performed; the raw value is stored as-is.
 
 ## Status
 
