@@ -1,6 +1,6 @@
 # web_link
 
-Web linking header parser library for [Pony](https://www.ponylang.io/).
+Web linking header parser library for Pony.
 
 ## Status
 
@@ -13,6 +13,10 @@ Under development. The API is not yet stable.
 * `corral fetch` to fetch your dependencies
 * `use "web_link"` to include this package
 * `corral run -- ponyc` to compile your application
+
+## Usage
+
+See [examples](examples/) for usage demonstrations.
 
 ## API Documentation
 
