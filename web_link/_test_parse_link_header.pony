@@ -117,7 +117,7 @@ class iso _PropertyValidLinkHeaderAccepted is
     h: PropertyHelper)
   =>
     (let header, let expected_target, let expected_rel) = sample
-    match ParseLinkHeader(header)
+    match \exhaustive\ ParseLinkHeader(header)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1,
         "expected 1 link for: " + header)
@@ -142,7 +142,7 @@ class iso _PropertyInvalidLinkHeaderRejected is Property1[String val]
     _InvalidLinkHeaderGen()
 
   fun ref property(sample: String val, h: PropertyHelper) =>
-    match ParseLinkHeader(sample)
+    match \exhaustive\ ParseLinkHeader(sample)
     | let links: Array[WebLink val] val =>
       h.fail("expected error but got " + links.size().string()
         + " links for: " + sample)
@@ -166,7 +166,7 @@ class iso _PropertyWebLinkStringRoundtrip is
     h: PropertyHelper)
   =>
     (let header, _, _) = sample
-    match ParseLinkHeader(header)
+    match \exhaustive\ ParseLinkHeader(header)
     | let links: Array[WebLink val] val =>
       try
         let link = links(0)?
@@ -207,7 +207,7 @@ class iso _PropertyRelAlwaysPresent is
     h: PropertyHelper)
   =>
     (let header, _, _) = sample
-    match ParseLinkHeader(header)
+    match \exhaustive\ ParseLinkHeader(header)
     | let links: Array[WebLink val] val =>
       for link in links.values() do
         h.assert_true(link.rel().size() > 0,
@@ -254,7 +254,7 @@ class iso _PropertyMultipleLinksParsed is Property1[USize]
     end
 
     let hdr: String val = consume header
-    match ParseLinkHeader(hdr)
+    match \exhaustive\ ParseLinkHeader(hdr)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), count,
         "expected " + count.string() + " links")
@@ -282,7 +282,7 @@ class iso _TestSingleLinkWithRel is UnitTest
 
   fun apply(h: TestHelper) =>
     let input = "<https://example.com/page/2>; rel=\"next\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
@@ -303,7 +303,7 @@ class iso _TestMultipleCommaLinks is UnitTest
     let input: String val =
       "<https://example.com/2>; rel=\"next\", " +
       "<https://example.com/5>; rel=\"last\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 2)
       try
@@ -327,18 +327,18 @@ class iso _TestMultipleParams is UnitTest
     let input: String val =
       "<https://example.com>; rel=\"alternate\"; " +
       "type=\"text/html\"; hreflang=\"en\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
         let link = links(0)?
         h.assert_eq[String val](link.rel(), "alternate")
-        match link.param("type")
+        match \exhaustive\ link.param("type")
         | let v: String val =>
           h.assert_eq[String val](v, "text/html")
         | None => h.fail("expected type param")
         end
-        match link.param("hreflang")
+        match \exhaustive\ link.param("hreflang")
         | let v: String val =>
           h.assert_eq[String val](v, "en")
         | None => h.fail("expected hreflang param")
@@ -355,12 +355,12 @@ class iso _TestValuelessParam is UnitTest
 
   fun apply(h: TestHelper) =>
     let input = "<https://example.com>; rel=\"next\"; myext"
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
         let link = links(0)?
-        match link.param("myext")
+        match \exhaustive\ link.param("myext")
         | let v: String val =>
           h.assert_eq[String val](v, "")
         | None => h.fail("expected myext param")
@@ -377,7 +377,7 @@ class iso _TestTokenValues is UnitTest
 
   fun apply(h: TestHelper) =>
     let input = "<https://example.com>; rel=next"
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
@@ -396,12 +396,12 @@ class iso _TestQuotedStringEscapes is UnitTest
     let input: String val =
       "<https://example.com>; rel=\"next\"; " +
       "title=\"say \\\"hello\\\" and \\\\done\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
         let link = links(0)?
-        match link.param("title")
+        match \exhaustive\ link.param("title")
         | let v: String val =>
           h.assert_eq[String val](v, "say \"hello\" and \\done")
         | None => h.fail("expected title param")
@@ -419,12 +419,12 @@ class iso _TestExtraWhitespace is UnitTest
   fun apply(h: TestHelper) =>
     let input =
       "<https://example.com> ; rel = \"next\" ; type = \"text/html\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
         h.assert_eq[String val](links(0)?.rel(), "next")
-        match links(0)?.param("type")
+        match \exhaustive\ links(0)?.param("type")
         | let v: String val =>
           h.assert_eq[String val](v, "text/html")
         | None => h.fail("expected type param")
@@ -443,7 +443,7 @@ class iso _TestEmptyElements is UnitTest
     let input: String val =
       ",, <https://example.com/a>; rel=\"first\",, " +
       "<https://example.com/b>; rel=\"last\" ,,"
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 2)
       try
@@ -463,7 +463,7 @@ class iso _TestCommaInsideUri is UnitTest
 
   fun apply(h: TestHelper) =>
     let input = "<https://example.com/a,b,c>; rel=\"next\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
@@ -481,12 +481,12 @@ class iso _TestCaseInsensitiveParams is UnitTest
 
   fun apply(h: TestHelper) =>
     let input = "<https://example.com>; REL=\"next\"; Type=\"text/html\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
         h.assert_eq[String val](links(0)?.rel(), "next")
-        match links(0)?.param("type")
+        match \exhaustive\ links(0)?.param("type")
         | let v: String val =>
           h.assert_eq[String val](v, "text/html")
         | None => h.fail("expected type param")
@@ -503,7 +503,7 @@ class iso _TestMultipleRels is UnitTest
 
   fun apply(h: TestHelper) =>
     let input = "<https://example.com>; rel=\"next prefetch\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
@@ -524,7 +524,7 @@ class iso _TestGitHubPagination is UnitTest
       "; rel=\"next\", " +
       "<https://api.github.com/repos/octocat/Hello-World/issues?page=5>" +
       "; rel=\"last\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 2)
       try
@@ -547,7 +547,7 @@ class iso _TestEmptyInput is UnitTest
   fun name(): String => "parse: empty input returns empty array"
 
   fun apply(h: TestHelper) =>
-    match ParseLinkHeader("")
+    match \exhaustive\ ParseLinkHeader("")
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 0)
     | let err: InvalidLinkHeader val =>
@@ -558,7 +558,7 @@ class iso _TestWhitespaceInput is UnitTest
   fun name(): String => "parse: whitespace-only input returns empty array"
 
   fun apply(h: TestHelper) =>
-    match ParseLinkHeader("   \t  ")
+    match \exhaustive\ ParseLinkHeader("   \t  ")
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 0)
     | let err: InvalidLinkHeader val =>
@@ -571,11 +571,11 @@ class iso _TestSemicolonsInQuotedString is UnitTest
   fun apply(h: TestHelper) =>
     let input =
       "<https://example.com>; rel=\"next\"; title=\"a;b;c\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
-        match links(0)?.param("title")
+        match \exhaustive\ links(0)?.param("title")
         | let v: String val =>
           h.assert_eq[String val](v, "a;b;c")
         | None => h.fail("expected title param")
@@ -593,11 +593,11 @@ class iso _TestDuplicateParamsFirstWins is UnitTest
   fun apply(h: TestHelper) =>
     let input =
       "<https://example.com>; rel=\"next\"; title=\"first\"; title=\"second\""
-    match ParseLinkHeader(input)
+    match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
-        match links(0)?.param("title")
+        match \exhaustive\ links(0)?.param("title")
         | let v: String val =>
           h.assert_eq[String val](v, "first")
         | None => h.fail("expected title param")
@@ -615,7 +615,7 @@ class iso _TestInvalidNoAngleBrackets is UnitTest
   fun name(): String => "parse invalid: no angle brackets"
 
   fun apply(h: TestHelper) =>
-    match ParseLinkHeader("https://example.com; rel=\"next\"")
+    match \exhaustive\ ParseLinkHeader("https://example.com; rel=\"next\"")
     | let links: Array[WebLink val] val =>
       h.fail("expected error")
     | let err: InvalidLinkHeader val => None
@@ -625,7 +625,7 @@ class iso _TestInvalidMissingRel is UnitTest
   fun name(): String => "parse invalid: missing rel parameter"
 
   fun apply(h: TestHelper) =>
-    match ParseLinkHeader("<https://example.com>; type=\"text/html\"")
+    match \exhaustive\ ParseLinkHeader("<https://example.com>; type=\"text/html\"")
     | let links: Array[WebLink val] val =>
       h.fail("expected error")
     | let err: InvalidLinkHeader val => None
@@ -635,7 +635,7 @@ class iso _TestInvalidUnterminatedUri is UnitTest
   fun name(): String => "parse invalid: unterminated URI"
 
   fun apply(h: TestHelper) =>
-    match ParseLinkHeader("<https://example.com")
+    match \exhaustive\ ParseLinkHeader("<https://example.com")
     | let links: Array[WebLink val] val =>
       h.fail("expected error")
     | let err: InvalidLinkHeader val => None
@@ -645,7 +645,7 @@ class iso _TestInvalidUnterminatedQuote is UnitTest
   fun name(): String => "parse invalid: unterminated quoted string"
 
   fun apply(h: TestHelper) =>
-    match ParseLinkHeader("<https://example.com>; rel=\"next")
+    match \exhaustive\ ParseLinkHeader("<https://example.com>; rel=\"next")
     | let links: Array[WebLink val] val =>
       h.fail("expected error")
     | let err: InvalidLinkHeader val => None
