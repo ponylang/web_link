@@ -101,7 +101,7 @@ class iso _PropertyValidLinkHeaderAccepted is
   Property1[(String val, String val, String val)]
   """
   Valid single-link headers always parse successfully and produce a link
-  whose target and rel match \exhaustive\ the generated inputs.
+  whose target and rel match the generated inputs.
   """
   fun name(): String =>
     "property: valid link headers always parse successfully"
