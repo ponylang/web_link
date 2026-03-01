@@ -7,7 +7,7 @@ The primary entry point is `ParseLinkHeader`, which takes a raw Link header
 string and returns an array of `WebLink` values or an `InvalidLinkHeader` error.
 
 ```pony
-match ParseLinkHeader(raw_header)
+match \exhaustive\ ParseLinkHeader(raw_header)
 | let links: Array[WebLink val] val =>
   for link in links.values() do
     env.out.print(link.target + " rel=" + link.rel())
@@ -69,7 +69,7 @@ class val WebLink is (Stringable & Equatable[WebLink])
   fun eq(that: WebLink box): Bool =>
     """
     Two links are equal when their targets and all parameter key-value pairs
-    match.
+    match \exhaustive\.
     """
     if target != that.target then return false end
     if params.size() != that.params.size() then return false end

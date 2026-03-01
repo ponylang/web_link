@@ -40,7 +40,7 @@ class ref _LinkParser
         return InvalidLinkHeader
       end
 
-      match _parse_link_value()
+      match \exhaustive\ _parse_link_value()
       | let link: WebLink val => result.push(link)
       | let err: InvalidLinkHeader val => return err
       end
@@ -64,12 +64,12 @@ class ref _LinkParser
     consume result
 
   fun ref _parse_link_value(): (WebLink val | InvalidLinkHeader val) =>
-    let target' = match _parse_uri_reference()
+    let target' = match \exhaustive\ _parse_uri_reference()
     | let u: String val => u
     | let err: InvalidLinkHeader val => return err
     end
 
-    let params': Map[String val, String val] val = match _parse_params()
+    let params': Map[String val, String val] val = match \exhaustive\ _parse_params()
     | let m: Map[String val, String val] iso => consume m
     | let err: InvalidLinkHeader val => return err
     end
@@ -133,7 +133,7 @@ class ref _LinkParser
       _pos = _pos + 1 // consume ';'
       _skip_ows()
 
-      match _parse_link_param()
+      match \exhaustive\ _parse_link_param()
       | (let k: String val, let v: String val) =>
         if not params'.contains(k) then
           params'(k) = v
@@ -147,7 +147,7 @@ class ref _LinkParser
   fun ref _parse_link_param()
     : ((String val, String val) | InvalidLinkHeader val)
   =>
-    let name = match _parse_token_lower()
+    let name = match \exhaustive\ _parse_token_lower()
     | let t: String val => t
     | let err: InvalidLinkHeader val => return err
     end

@@ -6,7 +6,7 @@ primitive ParseLinkHeader
   whitespace-only input returns an empty array.
 
   ```pony
-  match ParseLinkHeader(raw_header)
+  match \exhaustive\ ParseLinkHeader(raw_header)
   | let links: Array[WebLink val] val =>
     for link in links.values() do
       // each link has .target, .rel(), .param(name)

@@ -6,7 +6,7 @@ actor Main
       "<https://api.example.com/items?page=2>; rel=\"next\", " +
       "<https://api.example.com/items?page=5>; rel=\"last\""
 
-    match ParseLinkHeader(header)
+    match \exhaustive\ ParseLinkHeader(header)
     | let links: Array[WebLink val] val =>
       env.out.print("Parsed " + links.size().string() + " links:")
       for link in links.values() do
