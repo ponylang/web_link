@@ -8,7 +8,7 @@ Web linking header parser library for Pony.
 make                    # build and run tests + examples (release)
 make test               # same as above
 make config=debug       # debug build
-make build-examples     # examples only
+make examples     # examples only
 make clean              # clean build artifacts + corral cache
 ```
 
