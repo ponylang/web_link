@@ -7,6 +7,7 @@ Web linking header parser library for Pony.
 ```bash
 make                    # build and run tests + examples (release)
 make test               # same as above
+make test-one t=TestName    # run a single test by name
 make config=debug       # debug build
 make examples     # examples only
 make clean              # clean build artifacts + corral cache
