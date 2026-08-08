@@ -30,7 +30,7 @@ actor \nodoc\ Main is TestList
     test(_TestQuotedStringEscapes)
     test(_TestExtraWhitespace)
     test(_TestEmptyElements)
-    test(_TestCommaInsideUri)
+    test(_TestCommaInsideURI)
     test(_TestCaseInsensitiveParams)
     test(_TestMultipleRels)
     test(_TestGitHubPagination)
@@ -40,7 +40,7 @@ actor \nodoc\ Main is TestList
     test(_TestDuplicateParamsFirstWins)
     test(_TestInvalidNoAngleBrackets)
     test(_TestInvalidMissingRel)
-    test(_TestInvalidUnterminatedUri)
+    test(_TestInvalidUnterminatedURI)
     test(_TestInvalidUnterminatedQuote)
 
     // WebLink type tests

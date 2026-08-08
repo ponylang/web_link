@@ -2,24 +2,22 @@ use "pony_test"
 use "pony_check"
 use "collections"
 
-// ---------------------------------------------------------------------------
-// Generators
-// ---------------------------------------------------------------------------
-
 primitive _ValidLinkHeaderGen
   fun single_link(): Generator[(String val, String val, String val)] =>
     """
     Generate (header, expected_target, expected_rel) tuples for single links.
     """
-    let uri_gen = Generators.one_of[String val](
-      [ "https://example.com/page/2"
-        "http://foo.bar/baz?q=1&r=2"
-        "/relative/path"
-        "https://api.github.com/repos?page=3"
-        "urn:example:resource"
-      ])
-    let rel_gen = Generators.one_of[String val](
-      ["next"; "prev"; "last"; "first"; "self"; "alternate"])
+    let uri_gen =
+      Generators.one_of[String val](
+        [ "https://example.com/page/2"
+          "http://foo.bar/baz?q=1&r=2"
+          "/relative/path"
+          "https://api.github.com/repos?page=3"
+          "urn:example:resource"
+        ])
+    let rel_gen =
+      Generators.one_of[String val](
+        ["next"; "prev"; "last"; "first"; "self"; "alternate"])
 
     Generators.zip2[String val, String val](uri_gen, rel_gen)
       .map[(String val, String val, String val)](
@@ -27,14 +25,15 @@ primitive _ValidLinkHeaderGen
           : (String val, String val, String val)
         =>
           (let uri, let rel) = pair
-          let header = recover val
-            String
-              .>push('<')
-              .>append(uri)
-              .>append(">; rel=\"")
-              .>append(rel)
-              .>push('"')
-          end
+          let header =
+            recover val
+              String
+                .> push('<')
+                .> append(uri)
+                .> append(">; rel=\"")
+                .> append(rel)
+                .> push('"')
+            end
           (header, uri, rel)
         })
 
@@ -44,19 +43,22 @@ primitive _ValidLinkHeaderGen
     """
     Generate single links with extra parameters beyond rel.
     """
-    let uri_gen = Generators.one_of[String val](
-      [ "https://example.com/page/2"
-        "http://foo.bar/baz"
-        "/items"
-      ])
-    let rel_gen = Generators.one_of[String val](
-      ["next"; "prev"; "last"; "self"])
-    let extra_gen = Generators.one_of[String val](
-      [ "; type=\"text/html\""
-        "; title=\"Page Title\""
-        "; hreflang=\"en\""
-        "; type=\"application/json\"; title=\"API\""
-      ])
+    let uri_gen =
+      Generators.one_of[String val](
+        [ "https://example.com/page/2"
+          "http://foo.bar/baz"
+          "/items"
+        ])
+    let rel_gen =
+      Generators.one_of[String val](
+        ["next"; "prev"; "last"; "self"])
+    let extra_gen =
+      Generators.one_of[String val](
+        [ "; type=\"text/html\""
+          "; title=\"Page Title\""
+          "; hreflang=\"en\""
+          "; type=\"application/json\"; title=\"API\""
+        ])
 
     Generators.zip3[String val, String val, String val](
       uri_gen, rel_gen, extra_gen)
@@ -65,15 +67,16 @@ primitive _ValidLinkHeaderGen
           : (String val, String val, String val)
         =>
           (let uri, let rel, let extra) = triple
-          let header = recover val
-            String
-              .>push('<')
-              .>append(uri)
-              .>append(">; rel=\"")
-              .>append(rel)
-              .>push('"')
-              .>append(extra)
-          end
+          let header =
+            recover val
+              String
+                .> push('<')
+                .> append(uri)
+                .> append(">; rel=\"")
+                .> append(rel)
+                .> push('"')
+                .> append(extra)
+            end
           (header, uri, rel)
         })
 
@@ -84,18 +87,14 @@ primitive _InvalidLinkHeaderGen
     Covers distinct failure modes.
     """
     Generators.one_of[String val](
-      [ "https://example.com"                        // no angle brackets
-        "<https://example.com>; type=\"text/html\""  // no rel
-        "<https://example.com"                       // unterminated URI
-        "<https://example.com>; rel=\"next"          // unterminated quote
-        "<https://example.com> rel=\"next\""         // missing semicolon
-        "< >; rel=\"next\" garbage"                  // trailing garbage
-        "<https://example.com>; =\"next\""           // empty param name
+      [ "https://example.com"
+        "<https://example.com>; type=\"text/html\""
+        "<https://example.com"
+        "<https://example.com>; rel=\"next"
+        "<https://example.com> rel=\"next\""
+        "< >; rel=\"next\" garbage"
+        "<https://example.com>; =\"next\""
       ])
-
-// ---------------------------------------------------------------------------
-// Property Tests
-// ---------------------------------------------------------------------------
 
 class iso _PropertyValidLinkHeaderAccepted is
   Property1[(String val, String val, String val)]
@@ -119,7 +118,9 @@ class iso _PropertyValidLinkHeaderAccepted is
     (let header, let expected_target, let expected_rel) = sample
     match \exhaustive\ ParseLinkHeader(header)
     | let links: Array[WebLink val] val =>
-      h.assert_eq[USize](links.size(), 1,
+      h.assert_eq[USize](
+        links.size(),
+        1,
         "expected 1 link for: " + header)
       try
         h.assert_eq[String val](links(0)?.target, expected_target)
@@ -171,12 +172,15 @@ class iso _PropertyWebLinkStringRoundtrip is
       try
         let link = links(0)?
         let serialized: String val = link.string()
-        match ParseLinkHeader(serialized)
+        match \exhaustive\ ParseLinkHeader(serialized)
         | let reparsed: Array[WebLink val] val =>
-          h.assert_eq[USize](reparsed.size(), 1,
+          h.assert_eq[USize](
+            reparsed.size(),
+            1,
             "reparsed should have 1 link")
           try
-            h.assert_true(link == reparsed(0)?,
+            h.assert_true(
+              link == reparsed(0)?,
               "roundtrip should produce equal link")
           else
             h.fail("could not access reparsed link")
@@ -210,7 +214,8 @@ class iso _PropertyRelAlwaysPresent is
     match \exhaustive\ ParseLinkHeader(header)
     | let links: Array[WebLink val] val =>
       for link in links.values() do
-        h.assert_true(link.rel().size() > 0,
+        h.assert_true(
+          link.rel().size() > 0,
           "rel should be non-empty")
       end
     | let err: InvalidLinkHeader val =>
@@ -229,13 +234,15 @@ class iso _PropertyMultipleLinksParsed is Property1[USize]
     Generators.usize(2, 5)
 
   fun ref property(count: USize, h: PropertyHelper) =>
-    let uris = [as String val:
-      "https://a.com"; "https://b.com"; "https://c.com"
-      "https://d.com"; "https://e.com"
-    ]
-    let rels = [as String val:
-      "next"; "prev"; "last"; "first"; "self"
-    ]
+    let uris =
+      [ as String val:
+        "https://a.com"; "https://b.com"; "https://c.com"
+        "https://d.com"; "https://e.com"
+      ]
+    let rels =
+      [ as String val:
+        "next"; "prev"; "last"; "first"; "self"
+      ]
 
     var header = recover iso String end
     var i: USize = 0
@@ -256,7 +263,9 @@ class iso _PropertyMultipleLinksParsed is Property1[USize]
     let hdr: String val = consume header
     match \exhaustive\ ParseLinkHeader(hdr)
     | let links: Array[WebLink val] val =>
-      h.assert_eq[USize](links.size(), count,
+      h.assert_eq[USize](
+        links.size(),
+        count,
         "expected " + count.string() + " links")
       var j: USize = 0
       while j < count do
@@ -264,7 +273,8 @@ class iso _PropertyMultipleLinksParsed is Property1[USize]
           h.assert_eq[String val](links(j)?.target, uris(j)?)
           h.assert_eq[String val](links(j)?.rel(), rels(j)?)
         else
-          h.fail("could not access link or expected value at index "
+          h.fail(
+            "could not access link or expected value at index "
             + j.string())
         end
         j = j + 1
@@ -272,10 +282,6 @@ class iso _PropertyMultipleLinksParsed is Property1[USize]
     | let err: InvalidLinkHeader val =>
       h.fail("expected success for: " + hdr)
     end
-
-// ---------------------------------------------------------------------------
-// Example-Based Tests
-// ---------------------------------------------------------------------------
 
 class iso _TestSingleLinkWithRel is UnitTest
   fun name(): String => "parse: single link with rel"
@@ -286,7 +292,8 @@ class iso _TestSingleLinkWithRel is UnitTest
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
-        h.assert_eq[String val](links(0)?.target,
+        h.assert_eq[String val](
+          links(0)?.target,
           "https://example.com/page/2")
         h.assert_eq[String val](links(0)?.rel(), "next")
       else
@@ -307,10 +314,12 @@ class iso _TestMultipleCommaLinks is UnitTest
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 2)
       try
-        h.assert_eq[String val](links(0)?.target,
+        h.assert_eq[String val](
+          links(0)?.target,
           "https://example.com/2")
         h.assert_eq[String val](links(0)?.rel(), "next")
-        h.assert_eq[String val](links(1)?.target,
+        h.assert_eq[String val](
+          links(1)?.target,
           "https://example.com/5")
         h.assert_eq[String val](links(1)?.rel(), "last")
       else
@@ -403,7 +412,8 @@ class iso _TestQuotedStringEscapes is UnitTest
         let link = links(0)?
         match \exhaustive\ link.param("title")
         | let v: String val =>
-          h.assert_eq[String val](v, "say \"hello\" and \\done")
+          h.assert_eq[String val](
+            v, "say \"hello\" and \\done")
         | None => h.fail("expected title param")
         end
       else
@@ -418,7 +428,8 @@ class iso _TestExtraWhitespace is UnitTest
 
   fun apply(h: TestHelper) =>
     let input =
-      "<https://example.com> ; rel = \"next\" ; type = \"text/html\""
+      "<https://example.com> ; rel = \"next\"" +
+      " ; type = \"text/html\""
     match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
@@ -447,9 +458,11 @@ class iso _TestEmptyElements is UnitTest
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 2)
       try
-        h.assert_eq[String val](links(0)?.target,
+        h.assert_eq[String val](
+          links(0)?.target,
           "https://example.com/a")
-        h.assert_eq[String val](links(1)?.target,
+        h.assert_eq[String val](
+          links(1)?.target,
           "https://example.com/b")
       else
         h.fail("could not access links")
@@ -458,8 +471,9 @@ class iso _TestEmptyElements is UnitTest
       h.fail("expected success")
     end
 
-class iso _TestCommaInsideUri is UnitTest
-  fun name(): String => "parse: URI containing comma inside angle brackets"
+class iso _TestCommaInsideURI is UnitTest
+  fun name(): String =>
+    "parse: URI containing comma inside angle brackets"
 
   fun apply(h: TestHelper) =>
     let input = "<https://example.com/a,b,c>; rel=\"next\""
@@ -467,7 +481,8 @@ class iso _TestCommaInsideUri is UnitTest
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
-        h.assert_eq[String val](links(0)?.target,
+        h.assert_eq[String val](
+          links(0)?.target,
           "https://example.com/a,b,c")
       else
         h.fail("could not access link")
@@ -480,7 +495,9 @@ class iso _TestCaseInsensitiveParams is UnitTest
   fun name(): String => "parse: parameter names are lowercased"
 
   fun apply(h: TestHelper) =>
-    let input = "<https://example.com>; REL=\"next\"; Type=\"text/html\""
+    let input =
+      "<https://example.com>; REL=\"next\"" +
+      "; Type=\"text/html\""
     match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
@@ -502,12 +519,14 @@ class iso _TestMultipleRels is UnitTest
   fun name(): String => "parse: multiple space-separated rels"
 
   fun apply(h: TestHelper) =>
-    let input = "<https://example.com>; rel=\"next prefetch\""
+    let input =
+      "<https://example.com>; rel=\"next prefetch\""
     match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
       try
-        h.assert_eq[String val](links(0)?.rel(), "next prefetch")
+        h.assert_eq[String val](
+          links(0)?.rel(), "next prefetch")
       else
         h.fail("could not access link")
       end
@@ -516,13 +535,16 @@ class iso _TestMultipleRels is UnitTest
     end
 
 class iso _TestGitHubPagination is UnitTest
-  fun name(): String => "parse: real GitHub pagination Link header"
+  fun name(): String =>
+    "parse: real GitHub pagination Link header"
 
   fun apply(h: TestHelper) =>
     let input: String val =
-      "<https://api.github.com/repos/octocat/Hello-World/issues?page=2>" +
+      "<https://api.github.com/repos/octocat/" +
+      "Hello-World/issues?page=2>" +
       "; rel=\"next\", " +
-      "<https://api.github.com/repos/octocat/Hello-World/issues?page=5>" +
+      "<https://api.github.com/repos/octocat/" +
+      "Hello-World/issues?page=5>" +
       "; rel=\"last\""
     match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
@@ -555,7 +577,8 @@ class iso _TestEmptyInput is UnitTest
     end
 
 class iso _TestWhitespaceInput is UnitTest
-  fun name(): String => "parse: whitespace-only input returns empty array"
+  fun name(): String =>
+    "parse: whitespace-only input returns empty array"
 
   fun apply(h: TestHelper) =>
     match \exhaustive\ ParseLinkHeader("   \t  ")
@@ -566,11 +589,13 @@ class iso _TestWhitespaceInput is UnitTest
     end
 
 class iso _TestSemicolonsInQuotedString is UnitTest
-  fun name(): String => "parse: semicolons inside quoted string values"
+  fun name(): String =>
+    "parse: semicolons inside quoted string values"
 
   fun apply(h: TestHelper) =>
     let input =
-      "<https://example.com>; rel=\"next\"; title=\"a;b;c\""
+      "<https://example.com>; rel=\"next\"" +
+      "; title=\"a;b;c\""
     match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
@@ -588,11 +613,13 @@ class iso _TestSemicolonsInQuotedString is UnitTest
     end
 
 class iso _TestDuplicateParamsFirstWins is UnitTest
-  fun name(): String => "parse: duplicate parameters — first wins"
+  fun name(): String =>
+    "parse: duplicate parameters — first wins"
 
   fun apply(h: TestHelper) =>
     let input =
-      "<https://example.com>; rel=\"next\"; title=\"first\"; title=\"second\""
+      "<https://example.com>; rel=\"next\"" +
+      "; title=\"first\"; title=\"second\""
     match \exhaustive\ ParseLinkHeader(input)
     | let links: Array[WebLink val] val =>
       h.assert_eq[USize](links.size(), 1)
@@ -609,13 +636,12 @@ class iso _TestDuplicateParamsFirstWins is UnitTest
       h.fail("expected success")
     end
 
-// --- Invalid input tests ---
-
 class iso _TestInvalidNoAngleBrackets is UnitTest
   fun name(): String => "parse invalid: no angle brackets"
 
   fun apply(h: TestHelper) =>
-    match \exhaustive\ ParseLinkHeader("https://example.com; rel=\"next\"")
+    match \exhaustive\ ParseLinkHeader(
+      "https://example.com; rel=\"next\"")
     | let links: Array[WebLink val] val =>
       h.fail("expected error")
     | let err: InvalidLinkHeader val => None
@@ -625,55 +651,60 @@ class iso _TestInvalidMissingRel is UnitTest
   fun name(): String => "parse invalid: missing rel parameter"
 
   fun apply(h: TestHelper) =>
-    match \exhaustive\ ParseLinkHeader("<https://example.com>; type=\"text/html\"")
+    match \exhaustive\ ParseLinkHeader(
+      "<https://example.com>; type=\"text/html\"")
     | let links: Array[WebLink val] val =>
       h.fail("expected error")
     | let err: InvalidLinkHeader val => None
     end
 
-class iso _TestInvalidUnterminatedUri is UnitTest
+class iso _TestInvalidUnterminatedURI is UnitTest
   fun name(): String => "parse invalid: unterminated URI"
 
   fun apply(h: TestHelper) =>
-    match \exhaustive\ ParseLinkHeader("<https://example.com")
+    match \exhaustive\ ParseLinkHeader(
+      "<https://example.com")
     | let links: Array[WebLink val] val =>
       h.fail("expected error")
     | let err: InvalidLinkHeader val => None
     end
 
 class iso _TestInvalidUnterminatedQuote is UnitTest
-  fun name(): String => "parse invalid: unterminated quoted string"
+  fun name(): String =>
+    "parse invalid: unterminated quoted string"
 
   fun apply(h: TestHelper) =>
-    match \exhaustive\ ParseLinkHeader("<https://example.com>; rel=\"next")
+    match \exhaustive\ ParseLinkHeader(
+      "<https://example.com>; rel=\"next")
     | let links: Array[WebLink val] val =>
       h.fail("expected error")
     | let err: InvalidLinkHeader val => None
     end
 
-// --- WebLink equality and string() tests ---
-
 class iso _TestWebLinkEquality is UnitTest
   fun name(): String => "WebLink: equality"
 
   fun apply(h: TestHelper) =>
-    let params1 = recover val
-      let m = Map[String val, String val]
-      m("rel") = "next"
-      m("type") = "text/html"
-      m
-    end
-    let params2 = recover val
-      let m = Map[String val, String val]
-      m("rel") = "next"
-      m("type") = "text/html"
-      m
-    end
-    let params3 = recover val
-      let m = Map[String val, String val]
-      m("rel") = "prev"
-      m
-    end
+    let params1 =
+      recover val
+        let m = Map[String val, String val]
+        m("rel") = "next"
+        m("type") = "text/html"
+        m
+      end
+    let params2 =
+      recover val
+        let m = Map[String val, String val]
+        m("rel") = "next"
+        m("type") = "text/html"
+        m
+      end
+    let params3 =
+      recover val
+        let m = Map[String val, String val]
+        m("rel") = "prev"
+        m
+      end
 
     let a = WebLink("https://a.com", params1)
     let b = WebLink("https://a.com", params2)
@@ -681,41 +712,47 @@ class iso _TestWebLinkEquality is UnitTest
     let d = WebLink("https://b.com", params1)
 
     h.assert_true(a == b, "same target+params should be equal")
-    h.assert_false(a == c, "different params should not be equal")
-    h.assert_false(a == d, "different targets should not be equal")
+    h.assert_false(
+      a == c, "different params should not be equal")
+    h.assert_false(
+      a == d, "different targets should not be equal")
 
 class iso _TestWebLinkString is UnitTest
   fun name(): String => "WebLink: string() serialization"
 
   fun apply(h: TestHelper) =>
-    let params' = recover val
-      let m = Map[String val, String val]
-      m("rel") = "next"
-      m("type") = "text/html"
-      m("title") = "Page 2"
-      m
-    end
+    let params' =
+      recover val
+        let m = Map[String val, String val]
+        m("rel") = "next"
+        m("type") = "text/html"
+        m("title") = "Page 2"
+        m
+      end
     let link = WebLink("https://example.com", params')
     let result: String val = link.string()
 
-    // rel comes first, then remaining sorted: title, type
-    h.assert_eq[String val](result,
-      "<https://example.com>; rel=\"next\"; title=\"Page 2\"" +
-      "; type=\"text/html\"")
+    h.assert_eq[String val](
+      result,
+      "<https://example.com>; rel=\"next\"" +
+      "; title=\"Page 2\"; type=\"text/html\"")
 
 class iso _TestWebLinkStringEscaping is UnitTest
-  fun name(): String => "WebLink: string() escapes quotes and backslashes"
+  fun name(): String =>
+    "WebLink: string() escapes quotes and backslashes"
 
   fun apply(h: TestHelper) =>
-    let params' = recover val
-      let m = Map[String val, String val]
-      m("rel") = "next"
-      m("title") = "say \"hi\" \\ done"
-      m
-    end
+    let params' =
+      recover val
+        let m = Map[String val, String val]
+        m("rel") = "next"
+        m("title") = "say \"hi\" \\ done"
+        m
+      end
     let link = WebLink("https://example.com", params')
     let result: String val = link.string()
 
-    h.assert_eq[String val](result,
+    h.assert_eq[String val](
+      result,
       "<https://example.com>; rel=\"next\"" +
       "; title=\"say \\\"hi\\\" \\\\ done\"")
