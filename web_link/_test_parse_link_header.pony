@@ -145,8 +145,8 @@ class iso _PropertyInvalidLinkHeaderRejected is Property1[String val]
   fun ref property(sample: String val, h: PropertyHelper) =>
     match \exhaustive\ ParseLinkHeader(sample)
     | let links: Array[WebLink val] val =>
-      h.fail("expected error but got " + links.size().string()
-        + " links for: " + sample)
+      h.fail("expected error but got " + links.size().string() +
+        " links for: " + sample)
     | let err: InvalidLinkHeader val => None
     end
 
@@ -274,8 +274,8 @@ class iso _PropertyMultipleLinksParsed is Property1[USize]
           h.assert_eq[String val](links(j)?.rel(), rels(j)?)
         else
           h.fail(
-            "could not access link or expected value at index "
-            + j.string())
+            "could not access link or expected value at index " +
+            j.string())
         end
         j = j + 1
       end
