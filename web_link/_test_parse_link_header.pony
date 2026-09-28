@@ -1,5 +1,4 @@
 use "pony_test"
-use "pony_check"
 use "collections"
 
 primitive _ValidLinkHeaderGen
@@ -97,7 +96,7 @@ primitive _InvalidLinkHeaderGen
       ])
 
 class iso _PropertyValidLinkHeaderAccepted is
-  Property1[(String val, String val, String val)]
+  Property[(String val, String val, String val)]
   """
   Valid single-link headers always parse successfully and produce a link
   whose target and rel match the generated inputs.
@@ -132,7 +131,7 @@ class iso _PropertyValidLinkHeaderAccepted is
       h.fail("expected success but got error for: " + header)
     end
 
-class iso _PropertyInvalidLinkHeaderRejected is Property1[String val]
+class iso _PropertyInvalidLinkHeaderRejected is Property[String val]
   """
   Generated invalid inputs always return InvalidLinkHeader.
   """
@@ -151,7 +150,7 @@ class iso _PropertyInvalidLinkHeaderRejected is Property1[String val]
     end
 
 class iso _PropertyWebLinkStringRoundtrip is
-  Property1[(String val, String val, String val)]
+  Property[(String val, String val, String val)]
   """
   For any parsed WebLink, serializing with string() and re-parsing produces
   an equivalent link.
@@ -196,7 +195,7 @@ class iso _PropertyWebLinkStringRoundtrip is
     end
 
 class iso _PropertyRelAlwaysPresent is
-  Property1[(String val, String val, String val)]
+  Property[(String val, String val, String val)]
   """
   Every parsed WebLink has a non-empty rel().
   """
@@ -222,7 +221,7 @@ class iso _PropertyRelAlwaysPresent is
       h.fail("expected success for: " + header)
     end
 
-class iso _PropertyMultipleLinksParsed is Property1[USize]
+class iso _PropertyMultipleLinksParsed is Property[USize]
   """
   Joining N valid link inputs with commas parses to exactly N links
   with matching targets and rels.

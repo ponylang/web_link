@@ -10,6 +10,7 @@ Under development. The API is not yet stable.
 
 ## Installation
 
+* Requires ponyc 0.74.0 or later.
 * Install [corral](https://github.com/ponylang/corral)
 * `corral add github.com/ponylang/web_link.git --version 0.1.0`
 * `corral fetch` to fetch your dependencies
