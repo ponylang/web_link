@@ -1,5 +1,4 @@
 use "pony_test"
-use "pony_check"
 
 actor \nodoc\ Main is TestList
   new create(env: Env) =>
@@ -7,19 +6,11 @@ actor \nodoc\ Main is TestList
 
   fun tag tests(test: PonyTest) =>
     // Property tests
-    test(Property1UnitTest[
-      (String val, String val, String val)
-    ](_PropertyValidLinkHeaderAccepted))
-    test(Property1UnitTest[String val](
-      _PropertyInvalidLinkHeaderRejected))
-    test(Property1UnitTest[
-      (String val, String val, String val)
-    ](_PropertyWebLinkStringRoundtrip))
-    test(Property1UnitTest[
-      (String val, String val, String val)
-    ](_PropertyRelAlwaysPresent))
-    test(Property1UnitTest[USize](
-      _PropertyMultipleLinksParsed))
+    test.property(_PropertyValidLinkHeaderAccepted)
+    test.property(_PropertyInvalidLinkHeaderRejected)
+    test.property(_PropertyWebLinkStringRoundtrip)
+    test.property(_PropertyRelAlwaysPresent)
+    test.property(_PropertyMultipleLinksParsed)
 
     // Example-based tests
     test(_TestSingleLinkWithRel)
