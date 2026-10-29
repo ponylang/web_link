@@ -82,7 +82,7 @@ class val WebLink is (Stringable & Equatable[WebLink])
     end
     true
 
-  fun string(): String iso^ =>
+  fun string(): String =>
     """
     Serialize to link-value format. Parameter values are always quoted.
     `rel` is emitted first; remaining parameters are sorted alphabetically
@@ -90,7 +90,7 @@ class val WebLink is (Stringable & Equatable[WebLink])
     """
     let t = target
     let p = params
-    recover iso
+    recover val
       let buf = String
       buf.push('<')
       buf.append(t)
